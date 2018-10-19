@@ -3,10 +3,10 @@
 
 import networkx as nx
 # import matplotlib.pyplot as plt
-from modules import maximum_matching_driver_nodes
+from modules import maximum_matching_driver_nodes, RandER
 import time
 
-g = nx.relabel_nodes(nx.read_edgelist('graph3.txt', create_using=nx.DiGraph), int)
+g = nx.relabel_nodes(nx.read_edgelist('graph4.txt', create_using=nx.DiGraph), int)
 print(nx.info(g))
 
 # pos = nx.layout.spring_layout(g)
@@ -43,3 +43,6 @@ d_nodes = maximum_matching_driver_nodes(g)
 end_time = time.process_time()
 print(d_nodes)
 print("Networkx time: {}".format(end_time-start_time))
+
+a = RandER(100, 0.5, seed=5)
+print(nx.info(a))

@@ -2,8 +2,38 @@
 
 import networkx as nx
 import collections
+import random
+import itertools
+
+def RandER(n, p, seed = None):
+    '''
+    Creates a random graph with n nodes and p probability of two vertices being connected.
+    (Currently works in O(n^2))
+    '''
+    G = nx.DiGraph()
+    G.add_nodes_from(range(1, n+1))
+
+    if p <= 0:
+        return G
+    elif p >=1:
+        return nx.complete_graph(n, create_using = nx.DiGraph)
+
+    if seed is not None:
+        random.seed(seed)
+
+    edge_list = itertools.permutations(range(1, n+1), 2)
+
+    for u, v in edge_list:
+        if random.random() > p:
+            G.add_edge(u, v)
+
+    return G
+
 
 def maximum_matching_driver_nodes(G):
+    '''
+    Returns the set of driver nodes that are identified by a maximal matching using the Hopcroft-Karp Algorithm.
+    '''
     # Unroll the given directed graph into a bipartite graph
     B = nx.DiGraph()
     B.add_nodes_from(G.nodes(), bipartite=0)
