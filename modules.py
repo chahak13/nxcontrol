@@ -33,7 +33,7 @@ def randER(n, p, seed = None):
 
 def randER_fast(n, p, seed = None):
     '''
-    A faster version of randER. Works in O(n+m) thereby solving the scalability issue of randER.
+    A faster version of randER. Works in O(n+m) for very small values of p, thereby solving the scalability issue of randER.
     '''
     G = nx.DiGraph()
     G.name = "randER_fast({n}, {p}, {seed})".format(n=n, p=p, seed=seed)
@@ -85,6 +85,26 @@ def maximum_matching_driver_nodes(G):
 
     return driverNodes
 
+def maximum_matching_all_driver_nodes(G):
+    '''
+    Returns the set of driver nodes that are identified by a maximal matching using the Hopcroft-Karp Algorithm.
+    '''
+    # Unroll the given directed graph into a bipartite graph
+    B = nx.DiGraph()
+    B.add_nodes_from(G.nodes(), bipartite=0)
+    B.add_nodes_from([-1*node for node in G.nodes()], bipartite=1)
+
+    bipartite_edges = [(e[0], -1*e[1]) for e in G.edges()]
+    B.add_edges_from(bipartite_edges)
+
+    # Calculate the driver nodes using maximum matching via HopcroftKarp
+    top_nodes = set(n for n,d in B.nodes(data=True) if d['bipartite']==0)
+    hp = HopcroftKarp(B, top_nodes)
+    matching = hp.match()
+    driverNodes = set(-x for x in matching.keys() if matching[x] is None and x<0)
+
+    return driverNodes
+
 class HopcroftKarp(object):
     INFINITY = -1
 
@@ -113,6 +133,35 @@ class HopcroftKarp(object):
 
         # print("Pair: ", self.pair)
         return self.pair
+
+    def match_all(self):
+        self.N1 = self.top_nodes
+        self.N2 = set(self.G.nodes) - self.top_nodes
+        self.pair = {}
+        self.dist = {}
+        self.q = collections.deque()
+
+        #init
+        for v in self.G:
+            self.pair[v] = None
+            self.dist[v] = HopcroftKarp.INFINITY
+
+        matching = 0
+
+        while self.bfs():
+            for v in self.N1:
+                if self.pair[v] is None and self.dfs(v):
+                    matching = matching + 1
+
+        additional_nodes = set()
+        for node in self.N2:
+            if node in matching:
+                continue
+            else:
+                continue
+        # print("Pair: ", self.pair)
+        return self.pair
+
 
     def dfs(self, v):
         if v != None:
@@ -147,3 +196,21 @@ class HopcroftKarp(object):
                         self.q.append(self.pair[u])
 
         return self.dist[None] != HopcroftKarp.INFINITY
+
+def minimum_dominating_set(G, start_with=None):
+    all_nodes = set(G)
+    if start_with is None:
+        v = set(G).pop() # pick a node
+    else:
+        if start_with not in G:
+            raise nx.NetworkXError('node %s not in G' % start_with)
+        v = start_with
+    D = set([v])
+    ND = set(G[v])
+    other = all_nodes - ND - D
+    while other:
+        w = other.pop()
+        D.add(w)
+        ND.update([nbr for nbr in G[w] if nbr not in D])
+        other = all_nodes - ND - D
+    return D
