@@ -1,5 +1,6 @@
 ## To Do:
-1. ~Hopcroft Karp and Maximum matching~
-2. Find all maximum matching
-3. ~Random ER graphs~ (Done with O(n<sup>2</sup>). Can be bettered)
-4. Degree preserved graphs
+- [x] Hopcroft Karp and Maximum matching
+- [] Find all maximum matching in one go
+- [x] Random ER graphs (O(n<sup>2</sup>)
+- [x] Random ER graphs for large n (O(n+m))
+- [] Degree preserved graphs
