@@ -4,13 +4,15 @@ import networkx as nx
 import collections
 import random
 import itertools
+import math
 
-def RandER(n, p, seed = None):
+def randER(n, p, seed = None):
     '''
     Creates a random graph with n nodes and p probability of two vertices being connected.
     (Currently works in O(n^2))
     '''
     G = nx.DiGraph()
+    G.name = "randER({n}, {p}, {seed})".format(n=n, p=p, seed=seed)
     G.add_nodes_from(range(1, n+1))
 
     if p <= 0:
@@ -24,11 +26,44 @@ def RandER(n, p, seed = None):
     edge_list = itertools.permutations(range(1, n+1), 2)
 
     for u, v in edge_list:
-        if random.random() > p:
+        if random.random() < p:
             G.add_edge(u, v)
 
     return G
 
+def randER_fast(n, p, seed = None):
+    '''
+    A faster version of randER. Works in O(n+m) thereby solving the scalability issue of randER.
+    '''
+    G = nx.DiGraph()
+    G.name = "randER_fast({n}, {p}, {seed})".format(n=n, p=p, seed=seed)
+    G.add_nodes_from(range(1, n+1))
+
+    if p <= 0:
+        return G
+    elif p >=1:
+        return nx.complete_graph(n, create_using = nx.DiGraph)
+
+    if seed is not None:
+        random.seed(seed)
+
+    if n<50:
+        return randER(n, p, seed)
+    else:
+        v, w = 1,0
+        while v<=n:
+            r = random.random()
+            w = w + 1 + math.floor((math.log(1-r)/math.log(1-p)))
+            if v==w:
+                w += 1
+            while w >= n and v <= n:
+                w = w - n + 1
+                v += 1
+                if v==w:
+                    w += 1
+            if v <= n:
+                G.add_edge(int(v), int(w))
+        return G
 
 def maximum_matching_driver_nodes(G):
     '''
