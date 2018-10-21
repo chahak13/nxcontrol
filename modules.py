@@ -9,7 +9,7 @@ import math
 def randER(n, p, seed = None):
     '''
     Creates a random graph with n nodes and p probability of two vertices being connected.
-    (Currently works in O(n^2))
+    Better for small graphs since the run time is O(n^2).
     '''
     G = nx.DiGraph()
     G.name = "randER({n}, {p}, {seed})".format(n=n, p=p, seed=seed)
