@@ -1,3 +1,2 @@
-
-def hello():
-    print("Hello World")
+from . import random
+from . import algorithms
