@@ -60,7 +60,7 @@ def test_minimum_dominating_set(G):
 
 if __name__ == '__main__':
 
-    g = nx.relabel_nodes(nx.read_edgelist('graph4.txt', create_using=nx.DiGraph), int)
+    g = nx.relabel_nodes(nx.read_edgelist('experiment_yeast.txt', create_using=nx.DiGraph), int)
     print(nx.info(g))
 
     # test_maximum_matching(g)
