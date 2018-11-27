@@ -1,2 +1,2 @@
-from . import random
+from . import randomGraphs
 from . import algorithms

@@ -1,8 +1,12 @@
 import networkx as nx
 import itertools
 import random
+import math
 
 def randER_directed(n, p, seed = None):
+    """Returns a random directed graph with n nodes and p probability of an edge existing.
+
+    """
     G = nx.DiGraph()
     G.add_nodes_from(range(1, n+1))
 
@@ -23,6 +27,9 @@ def randER_directed(n, p, seed = None):
     return G
 
 def randER_undirected(n, p, seed = None):
+    """Returns a random undirected graph with n nodes and p probability of an edge existing.
+
+    """
     G = nx.Graph()
     G.add_nodes_from(range(1, n+1))
 
@@ -44,7 +51,7 @@ def randER_undirected(n, p, seed = None):
 
 def randER_fast_directed(n, p, seed = None):
     '''
-    A faster version of randER. Works in O(n+m) for very small values of p, thereby solving the scalability issue of randER.
+    A faster version of randER_directed. Works in O(n+m) for very small values of p, thereby solving the scalability issue of randER_directed.
     '''
     G = nx.DiGraph()
     G.name = "randER_fast_directed({n}, {p}, {seed})".format(n=n, p=p, seed=seed)
@@ -79,7 +86,7 @@ def randER_fast_directed(n, p, seed = None):
 
 def randER_fast_undirected(n, p, seed = None):
     '''
-    A faster version of randER. Works in O(n+m) for very small values of p, thereby solving the scalability issue of randER.
+    A faster version of randER_undirected. Works in O(n+m) for very small values of p, thereby solving the scalability issue of randER_undirected.
     '''
     G = nx.DiGraph()
     G.name = "randER_fast_undirected({n}, {p}, {seed})".format(n=n, p=p, seed=seed)
@@ -112,6 +119,9 @@ def randER_fast_undirected(n, p, seed = None):
         return G
 
 def rand_gnm_directed(n, m, seed=None):
+    """Returns a random directed graph with n nodes and any m edges out of all possible edges.
+
+    """
     G = nx.DiGraph()
     G.name = "rand_gnm_directed({n}, {m}, {seed})".format(n=n, m=m, seed=seed)
     G.add_nodes_from(range(1, n+1))
@@ -119,7 +129,7 @@ def rand_gnm_directed(n, m, seed=None):
     if seed is not None:
         random.seed(seed)
 
-    full_edge_list = itertools.permutations(range(1, n+1), 2)
+    full_edge_list = [item for item in itertools.permutations(range(1, n+1), 2)]
     edge_list = random.sample(full_edge_list, m)
 
     for u, v in edge_list:
@@ -128,6 +138,9 @@ def rand_gnm_directed(n, m, seed=None):
     return G
 
 def rand_gnm_undirected(n, m, seed=None):
+    """Returns a random undirected graph with n nodes and any m edges out of all possible edges.
+
+    """
     G = nx.Graph()
     G.name = "rand_gnm_undirected({n}, {m}, {seed})".format(n=n, m=m, seed=seed)
     G.add_nodes_from(range(1, n+1))
@@ -135,7 +148,7 @@ def rand_gnm_undirected(n, m, seed=None):
     if seed is not None:
         random.seed(seed)
 
-    full_edge_list = itertools.combinations(range(1, n+1), 2)
+    full_edge_list = [item for item in itertools.combinations(range(1, n+1), 2)]
     edge_list = random.sample(full_edge_list, m)
 
     for u, v in edge_list:
@@ -144,6 +157,10 @@ def rand_gnm_undirected(n, m, seed=None):
     return G
 
 def undirected_degree_preserving_random_graph(degreeSequence):
+    """Returns a random graph with n nodes, with the degree distribution same as that given by the argument ``degreeSequence``.
+
+    """
+
     assert(nx.is_valid_degree_sequence(degreeSequence))
 
     num_nodes = len(degreeSequence)
@@ -153,29 +170,21 @@ def undirected_degree_preserving_random_graph(degreeSequence):
         num_degrees.append([])
     dmax, dsum, n = 0, 0, 0
     for d in degreeSequence:
-        # Process only the non-zero integers
         if d>0:
             num_degrees[d].append(n)
             dmax, dsum, n = max(dmax,d), dsum+d, n+1
-    # Return graph if no edges
     if n==0:
         return G
 
     modstubs = [(0,0)]*(dmax+1)
-    # Successively reduce degree sequence by removing the maximum degree
     while n > 0:
-        # Retrieve the maximum degree in the sequence
         while len(num_degrees[dmax]) == 0:
             dmax -= 1;
-        # If there are not enough stubs to connect to, then the sequence is
-        # not graphical
         if dmax > n-1:
-            raise nx.NetworkXError('Non-graphical integer sequence')
+            raise nx.NetworkXError('Sequence provided cannot be used on a graph.')
 
-        # Remove largest stub in list
         source = num_degrees[dmax].pop()
         n -= 1
-        # Reduce the next dmax largest stubs
         mslen = 0
         k = dmax
         for i in range(dmax):
@@ -187,11 +196,9 @@ def undirected_degree_preserving_random_graph(degreeSequence):
             if k > 1:
                 modstubs[mslen] = (k-1,target)
                 mslen += 1
-        # Add back to the list any nonzero stubs that were removed
         for i  in range(mslen):
             (stubval, stubtarget) = modstubs[i]
             num_degrees[stubval].append(stubtarget)
             n += 1
 
-    G.name="undirected_degree_preserving_random_graph %d nodes %d edges"%(G.order(),G.size())
     return G
