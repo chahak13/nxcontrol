@@ -12,26 +12,24 @@ It provides the following:
 * Python 3
 * networkx graph library
 
+
+## Setup
+
 ```
 pip install networkx
 ```
 Or alternatively
-
 ```
 pip3 install networkx
 ```
 
 ## Development
+Run the following on your command line:
 
-```
+``` bash
 git clone https://github.com/chahak13/nxcontrol.git
-```
-Switch to the `nxcontrol` directory
-```
 cd nxcontrol
-```
-Now install the package
-```
 pip install -e .
 ```
+
 The above command creates a symlink to the nxcontrol repository cloned. This enables the package to be developed. All changes made the the nxcontrol directory are reflected globally.
